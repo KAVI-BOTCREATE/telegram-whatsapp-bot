@@ -2,6 +2,7 @@ const TelegramBot = require('node-telegram-bot-api');
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const fs = require('fs');
 const dotenv = require('dotenv');
+const { chromium } = require('playwright');
 
 dotenv.config();
 
@@ -13,7 +14,13 @@ const telegramBot = new TelegramBot(TELEGRAM_TOKEN, { polling: true });
 
 // Initialize WhatsApp Web client
 const whatsappClient = new Client({
-    authStrategy: new LocalAuth({ clientId: "telegram-whatsapp-bot" })
+    authStrategy: new LocalAuth({ clientId: "telegram-whatsapp-bot" }),
+    puppeteer: {
+        browserWSEndpoint: async () => {
+            const browser = await chromium.launch();
+            return browser.wsEndpoint();
+        }
+    }
 });
 
 // WhatsApp client ready
